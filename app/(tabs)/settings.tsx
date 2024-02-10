@@ -5,8 +5,8 @@ import { Link } from 'expo-router'
 const Page = () => {
   return (
     <View>
-      <Text>Index</Text>
-      <Link href={"/listing/12345"}>Go TO Issue</Link>
+      <Text>Settings</Text>
+      <Link href={"/(modals)/login"}>Login</Link>
     </View>
   )
 }
