@@ -10,7 +10,7 @@ const Page = () => {
   const [issue, setIssue] = useState<Issue | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
+  
   useEffect(() => {
     if (id) {
       issueService
@@ -23,6 +23,12 @@ const Page = () => {
         .finally(() => setLoading(false));
     }
   }, [id]);
+
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    const options: Intl.DateTimeFormatOptions = { day: '2-digit', month: 'long', year: 'numeric' };
+    return date.toLocaleDateString('es-ES', options);
+  };
 
   if (loading) {
     return (
@@ -47,6 +53,7 @@ const Page = () => {
           <Image source={{ uri: issue.imageUrl }} style={styles.image} />
           <View style={styles.textContainer}>
             <Text style={styles.title}>{issue.title}</Text>
+            <Text>Reportado el {formatDate(issue.createdAt.toString())}</Text>
             <Text>{issue.description}</Text>
             <Text>{issue.status.name}</Text>
           </View>

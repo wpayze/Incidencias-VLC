@@ -1,5 +1,8 @@
+import PlaceSearchInput from "@/components/PlaceSearchInput";
 import { Category } from "@/constants/category";
 import Colors from "@/constants/colors";
+import { Issue } from "@/constants/issue";
+import { NewIssue } from "@/constants/request/newIssue";
 import { Status } from "@/constants/status";
 import issueService from "@/services/issueService";
 import { Picker } from "@react-native-picker/picker";
@@ -17,6 +20,8 @@ const Page: React.FC = () => {
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [address, setAddress] = useState<string>("");
+  const [lat, setLat] = useState<string>("");
+  const [lon, setLon] = useState<string>("");
   const [imageUrl, setImageUrl] = useState<string>("");
 
   const [categories, setCategories] = useState<Category[]>([]);
@@ -44,17 +49,37 @@ const Page: React.FC = () => {
     loadCategoriesAndStatuses();
   }, []);
 
-  const handleCreateIssue = () => {
-    console.log({
+  const handlePlaceSelection = (place: NominatimPlace) => {
+    const latitude = place.lat;
+    const longitude = place.lon;
+    setLat(latitude);
+    setLon(longitude);
+    setAddress(place.display_name);
+  };
+
+  const handleCreateIssue = async () => {
+    if (selectedCategory === undefined || selectedStatus === undefined) return;
+
+    const newIssue = new NewIssue(
       title,
       description,
       address,
-      imageUrl,
-    });
-  };
+      lat,
+      lon,
+      14,
+      selectedCategory,
+      selectedStatus
+    );
 
+    try {
+      const createdIssue = await issueService.createIssue(newIssue);
+      console.log("Incidencia creada:", createdIssue);
+    } catch (error) {
+      console.error("Hubo un error al crear la incidencia:", error);
+    }
+  };
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <Text style={styles.header}>Crear Reporte de Incidencia</Text>
       <Text style={styles.description}>
         Por favor, rellena los siguientes campos para reportar tu incidencia.
@@ -73,12 +98,8 @@ const Page: React.FC = () => {
         onChangeText={setDescription}
         style={styles.input}
       />
-      <TextInput
-        placeholder="Dirección"
-        value={address}
-        onChangeText={setAddress}
-        style={styles.input}
-      />
+
+      <PlaceSearchInput onPlaceSelected={handlePlaceSelection} />
 
       <Text>Categoría:</Text>
       <Picker
@@ -106,15 +127,19 @@ const Page: React.FC = () => {
         ))}
       </Picker>
 
-      <Button title="REPORTAR" onPress={handleCreateIssue} color={Colors.primary}/>
-    </ScrollView>
+      <Button
+        title="REPORTAR"
+        onPress={handleCreateIssue}
+        color={Colors.primary}
+      />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    margin: 20,
   },
   header: {
     fontSize: 24,
@@ -133,6 +158,8 @@ const styles = StyleSheet.create({
   },
   picker: {
     marginBottom: 10,
+    borderWidth: 1,
+    borderColor: "#cccccc",
   },
 });
 
