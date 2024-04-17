@@ -10,9 +10,10 @@ import {
 } from "react-native";
 interface SearchInputProps {
   onPlaceSelected: (place: NominatimPlace) => void;
+  onClear: () => void;
 }
 
-const PlaceSearchInput: React.FC<SearchInputProps> = ({ onPlaceSelected }) => {
+const PlaceSearchInput: React.FC<SearchInputProps> = ({ onPlaceSelected, onClear }) => {
   const [query, setQuery] = useState<string>("");
   const [results, setResults] = useState<NominatimPlace[]>([]);
   const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(
@@ -30,7 +31,6 @@ const PlaceSearchInput: React.FC<SearchInputProps> = ({ onPlaceSelected }) => {
           `https://nominatim.openstreetmap.org/search?format=json&limit=3&q=${text}`
         );
         const data: NominatimPlace[] = await response.json();
-        console.log(data);
         setResults(data);
       } else {
         setResults([]);
@@ -49,6 +49,7 @@ const PlaceSearchInput: React.FC<SearchInputProps> = ({ onPlaceSelected }) => {
   const handleClear = () => {
     setQuery("");
     setResults([]);
+    onClear();
   };
 
   return (

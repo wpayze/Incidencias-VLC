@@ -31,6 +31,12 @@ const Page: React.FC = () => {
   >();
   const [selectedStatus, setSelectedStatus] = useState<number | undefined>();
 
+  const [errors, setErrors] = useState<{
+    title?: string;
+    description?: string;
+    address?: string;
+  }>({});
+
   useEffect(() => {
     const loadCategoriesAndStatuses = async () => {
       try {
@@ -57,7 +63,37 @@ const Page: React.FC = () => {
     setAddress(place.display_name);
   };
 
+  const onClearPlace = () => {
+    setLat("");
+    setLon("");
+    setAddress("");
+  }
+
+  const validate = () => {
+    let isValid = true;
+    let newErrors = {};
+
+    if (title.trim() === "") {
+      newErrors = { ...newErrors, title: "El título es obligatorio." };
+      isValid = false;
+    }
+
+    if (description.trim() === "") {
+      newErrors = { ...newErrors, description: "La descripción es obligatoria." };
+      isValid = false;
+    }
+
+    if (address.trim() === "") {
+      newErrors = { ...newErrors, address: "La dirección es obligatoria." };
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
   const handleCreateIssue = async () => {
+    if (!validate()) return;
     if (selectedCategory === undefined || selectedStatus === undefined) return;
 
     const newIssue = new NewIssue(
@@ -92,14 +128,18 @@ const Page: React.FC = () => {
         onChangeText={setTitle}
         style={styles.input}
       />
+      {errors.title && <Text style={styles.errorText}>{errors.title}</Text>}
+
       <TextInput
         placeholder="Descripción"
         value={description}
         onChangeText={setDescription}
         style={styles.input}
       />
+      {errors.description && <Text style={styles.errorText}>{errors.description}</Text>}
 
-      <PlaceSearchInput onPlaceSelected={handlePlaceSelection} />
+      <PlaceSearchInput onPlaceSelected={handlePlaceSelection} onClear={onClearPlace} />
+      {errors.address && <Text style={styles.errorText}>{errors.address}</Text>}
 
       <Text>Categoría:</Text>
       <Picker
@@ -160,6 +200,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderWidth: 1,
     borderColor: "#cccccc",
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 10,
   },
 });
 
