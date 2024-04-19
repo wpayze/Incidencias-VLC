@@ -1,16 +1,12 @@
-interface LoginResponse {
-  token: string;
-}
+import { LoginRequest } from "@/constants/request/loginRequest";
+import { LoginResponse } from "@/constants/response/loginResponse";
 
-interface LoginCredentials {
-  username: string;
-  password: string;
-}
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 const authService = {
-  login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
+  login: async (credentials: LoginRequest): Promise<LoginResponse> => {
     try {
-      const response = await fetch("TU_ENDPOINT_DE_LOGIN", {
+      const response = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,7 +1,7 @@
 import { AuthProvider } from "@/context/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useFonts } from "expo-font";
-import { Stack, useRouter } from "expo-router";
+import { Stack, router } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { TouchableOpacity } from "react-native";
@@ -49,8 +49,6 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const router = useRouter();
-
   return (
     <Stack>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

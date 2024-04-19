@@ -1,9 +1,9 @@
 import PlaceSearchInput from "@/components/PlaceSearchInput";
 import { Category } from "@/constants/category";
 import Colors from "@/constants/colors";
-import { Issue } from "@/constants/issue";
 import { NewIssue } from "@/constants/request/newIssue";
 import { Status } from "@/constants/status";
+import { useAuth } from "@/context/AuthContext";
 import issueService from "@/services/issueService";
 import { Picker } from "@react-native-picker/picker";
 import React, { useEffect, useState } from "react";
@@ -13,8 +13,9 @@ import {
   TextInput,
   Button,
   StyleSheet,
-  ScrollView,
 } from "react-native";
+import { router } from "expo-router";
+import LogInBlock from "@/components/LogInBlock";
 
 const Page: React.FC = () => {
   const [title, setTitle] = useState<string>("");
@@ -37,7 +38,11 @@ const Page: React.FC = () => {
     address?: string;
   }>({});
 
+  const { isLoggedIn, currentUser } = useAuth();
+
   useEffect(() => {
+    if (!isLoggedIn) return;
+
     const loadCategoriesAndStatuses = async () => {
       try {
         const loadedCategories = await issueService.getCategories();
@@ -51,9 +56,8 @@ const Page: React.FC = () => {
         console.error("Error loading data:", error);
       }
     };
-
     loadCategoriesAndStatuses();
-  }, []);
+  }, [isLoggedIn]);
 
   const handlePlaceSelection = (place: NominatimPlace) => {
     const latitude = place.lat;
@@ -67,7 +71,7 @@ const Page: React.FC = () => {
     setLat("");
     setLon("");
     setAddress("");
-  }
+  };
 
   const validate = () => {
     let isValid = true;
@@ -79,7 +83,10 @@ const Page: React.FC = () => {
     }
 
     if (description.trim() === "") {
-      newErrors = { ...newErrors, description: "La descripción es obligatoria." };
+      newErrors = {
+        ...newErrors,
+        description: "La descripción es obligatoria.",
+      };
       isValid = false;
     }
 
@@ -95,6 +102,7 @@ const Page: React.FC = () => {
   const handleCreateIssue = async () => {
     if (!validate()) return;
     if (selectedCategory === undefined || selectedStatus === undefined) return;
+    if (!currentUser?.id) return;
 
     const newIssue = new NewIssue(
       title,
@@ -102,18 +110,23 @@ const Page: React.FC = () => {
       address,
       lat,
       lon,
-      14,
+      currentUser?.id,
       selectedCategory,
       selectedStatus
     );
 
     try {
-      const createdIssue = await issueService.createIssue(newIssue);
-      console.log("Incidencia creada:", createdIssue);
+      await issueService.createIssue(newIssue);
+      router.navigate("/")
     } catch (error) {
       console.error("Hubo un error al crear la incidencia:", error);
     }
   };
+
+  if (!isLoggedIn) {
+    return <LogInBlock title="Crear Reporte de Incidencia" />
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Crear Reporte de Incidencia</Text>
@@ -136,9 +149,14 @@ const Page: React.FC = () => {
         onChangeText={setDescription}
         style={styles.input}
       />
-      {errors.description && <Text style={styles.errorText}>{errors.description}</Text>}
+      {errors.description && (
+        <Text style={styles.errorText}>{errors.description}</Text>
+      )}
 
-      <PlaceSearchInput onPlaceSelected={handlePlaceSelection} onClear={onClearPlace} />
+      <PlaceSearchInput
+        onPlaceSelected={handlePlaceSelection}
+        onClear={onClearPlace}
+      />
       {errors.address && <Text style={styles.errorText}>{errors.address}</Text>}
 
       <Text>Categoría:</Text>
@@ -202,7 +220,7 @@ const styles = StyleSheet.create({
     borderColor: "#cccccc",
   },
   errorText: {
-    color: 'red',
+    color: "red",
     marginBottom: 10,
   },
 });
