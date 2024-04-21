@@ -8,14 +8,16 @@ import issueService from "@/services/issueService";
 import { Picker } from "@react-native-picker/picker";
 import React, { useEffect, useState } from "react";
 import {
-  View,
   Text,
   TextInput,
   Button,
   StyleSheet,
+  Image,
+  ScrollView,
 } from "react-native";
 import { router } from "expo-router";
 import LogInBlock from "@/components/LogInBlock";
+import * as ImagePicker from "expo-image-picker";
 
 const Page: React.FC = () => {
   const [title, setTitle] = useState<string>("");
@@ -58,6 +60,29 @@ const Page: React.FC = () => {
     };
     loadCategoriesAndStatuses();
   }, [isLoggedIn]);
+
+  const pickImage = async () => {
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (permissionResult.granted === false) {
+      alert("Se requieren permisos para acceder a tus fotos.");
+      return;
+    }
+
+    const pickerResult = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+      base64: false,
+    });
+
+    if (pickerResult.canceled) {
+      return;
+    }
+
+    setImageUrl(pickerResult.assets[0].uri);
+  };
 
   const handlePlaceSelection = (place: NominatimPlace) => {
     const latitude = place.lat;
@@ -117,24 +142,34 @@ const Page: React.FC = () => {
 
     try {
       await issueService.createIssue(newIssue);
-      router.navigate("/")
+      router.navigate("/");
     } catch (error) {
       console.error("Hubo un error al crear la incidencia:", error);
     }
   };
 
   if (!isLoggedIn) {
-    return <LogInBlock title="Crear Reporte de Incidencia" />
+    return <LogInBlock title="Crear Reporte de Incidencia" />;
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
       <Text style={styles.header}>Crear Reporte de Incidencia</Text>
       <Text style={styles.description}>
         Por favor, rellena los siguientes campos para reportar tu incidencia.
         Asegúrate de describir detalladamente el problema y añadir una imagen
         que ilustre la situación.
       </Text>
+      <Button
+        title="Seleccionar Imagen"
+        onPress={pickImage} 
+        color={Colors.primary}
+      />
+
+      {imageUrl ? (
+        <Image source={{ uri: imageUrl }} style={{ width: 200, height: 200 }} />
+      ) : null}
+
       <TextInput
         placeholder="Título"
         value={title}
@@ -190,7 +225,7 @@ const Page: React.FC = () => {
         onPress={handleCreateIssue}
         color={Colors.primary}
       />
-    </View>
+    </ScrollView>
   );
 };
 

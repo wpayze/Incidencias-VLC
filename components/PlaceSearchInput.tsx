@@ -73,6 +73,7 @@ const PlaceSearchInput: React.FC<SearchInputProps> = ({ onPlaceSelected, onClear
       <FlatList
         data={results}
         keyExtractor={(item) => item.place_id}
+        nestedScrollEnabled={false}
         renderItem={({ item }) => (
           <TouchableOpacity onPress={() => handleSelectPlace(item)}>
             <Text style={styles.item}>{item.display_name}</Text>
