@@ -18,6 +18,8 @@ import {
 import { router } from "expo-router";
 import LogInBlock from "@/components/LogInBlock";
 import * as ImagePicker from "expo-image-picker";
+import { Issue } from "@/constants/issue";
+import imageService from "@/services/imageService";
 
 const Page: React.FC = () => {
   const [title, setTitle] = useState<string>("");
@@ -25,7 +27,7 @@ const Page: React.FC = () => {
   const [address, setAddress] = useState<string>("");
   const [lat, setLat] = useState<string>("");
   const [lon, setLon] = useState<string>("");
-  const [imageUrl, setImageUrl] = useState<string>("");
+  const [image, setImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [statuses, setStatuses] = useState<Status[]>([]);
@@ -81,7 +83,7 @@ const Page: React.FC = () => {
       return;
     }
 
-    setImageUrl(pickerResult.assets[0].uri);
+    setImage(pickerResult.assets[0]);
   };
 
   const handlePlaceSelection = (place: NominatimPlace) => {
@@ -141,11 +143,18 @@ const Page: React.FC = () => {
     );
 
     try {
-      await issueService.createIssue(newIssue);
+      const createdIssue: Issue = await issueService.createIssue(newIssue);
+      uploadImage(createdIssue.id);
       router.navigate("/");
     } catch (error) {
       console.error("Hubo un error al crear la incidencia:", error);
     }
+  };
+
+  const uploadImage = async (issueId: number) => {
+    const uri = image?.uri;
+    if (!uri) return;
+    imageService.uploadImage(issueId, uri);
   };
 
   if (!isLoggedIn) {
@@ -162,12 +171,15 @@ const Page: React.FC = () => {
       </Text>
       <Button
         title="Seleccionar Imagen"
-        onPress={pickImage} 
+        onPress={pickImage}
         color={Colors.primary}
       />
 
-      {imageUrl ? (
-        <Image source={{ uri: imageUrl }} style={{ width: 200, height: 200 }} />
+      {image && image.uri ? (
+        <Image
+          source={{ uri: image.uri }}
+          style={{ width: 200, height: 200 }}
+        />
       ) : null}
 
       <TextInput

@@ -2,11 +2,11 @@ import colors from "@/constants/colors";
 import React, { useState } from "react";
 import {
   TextInput,
-  FlatList,
   Text,
   View,
   StyleSheet,
-  TouchableOpacity
+  TouchableOpacity,
+  ScrollView
 } from "react-native";
 interface SearchInputProps {
   onPlaceSelected: (place: NominatimPlace) => void;
@@ -64,22 +64,17 @@ const PlaceSearchInput: React.FC<SearchInputProps> = ({ onPlaceSelected, onClear
           }}
           value={query}
         />
-        <View>
-          <TouchableOpacity style={styles.clearButton} onPress={handleClear}>
-            <Text style={styles.clearButtonText}>Limpiar</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity style={styles.clearButton} onPress={handleClear}>
+          <Text style={styles.clearButtonText}>Limpiar</Text>
+        </TouchableOpacity>
       </View>
-      <FlatList
-        data={results}
-        keyExtractor={(item) => item.place_id}
-        nestedScrollEnabled={false}
-        renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => handleSelectPlace(item)}>
+      <ScrollView style={styles.resultsContainer}>
+        {results.map((item) => (
+          <TouchableOpacity key={item.place_id} onPress={() => handleSelectPlace(item)}>
             <Text style={styles.item}>{item.display_name}</Text>
           </TouchableOpacity>
-        )}
-      />
+        ))}
+      </ScrollView>
     </View>
   );
 };
@@ -113,6 +108,9 @@ const styles = StyleSheet.create({
     padding: 10,
     fontSize: 14,
     borderWidth: 1,
+    marginTop: 2,
+  },
+  resultsContainer: {
     marginTop: 2,
   },
 });

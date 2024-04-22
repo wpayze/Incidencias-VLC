@@ -17,11 +17,13 @@ interface IssueItemProps {
   issue: Issue;
 }
 
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
+
 const IssueItem: React.FC<IssueItemProps> = ({ issue }) => {
   return (
     <Link href={`/listing/${issue.id}`}>
       <View style={styles.itemContainer}>
-        <Image source={{ uri: issue.imageUrl }} style={styles.image} />
+        <Image source={{ uri: `${API_URL}/images/${issue.imageUrl}` }} style={styles.image} />
         <View style={styles.textContainer}>
           <Text style={styles.title}>{issue.title}</Text>
           <Text>{issue.description}</Text>
