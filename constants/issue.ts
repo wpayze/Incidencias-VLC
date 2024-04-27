@@ -1,6 +1,7 @@
 import { User } from "./user";
 import { Category } from "./category";
 import { Status } from "./status";
+import { Comment } from "./comment";
 
 export class Issue {
   id: number;
@@ -15,6 +16,8 @@ export class Issue {
   imageUrl: string;
   createdAt: Date;
   updatedAt: Date;
+
+  comments: Comment[];
 
   constructor(
     id: number,
@@ -42,5 +45,6 @@ export class Issue {
     this.imageUrl = imageUrl;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
+    this.comments = new Array();
   }
 }
