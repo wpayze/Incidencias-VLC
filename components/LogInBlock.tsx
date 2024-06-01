@@ -1,18 +1,19 @@
 import colors from "@/constants/colors";
 import { Link } from "expo-router";
 import React from "react";
-import { StyleSheet, Text, View, Button, TouchableOpacity, Pressable } from "react-native";
+import { StyleSheet, Text, View, Pressable } from "react-native";
 
 interface LogInBlockProps {
   title: string;
+  instructions: string;
 }
 
-const LogInBlock: React.FC<LogInBlockProps> = ({ title }) => {
+const LogInBlock: React.FC<LogInBlockProps> = ({ title, instructions }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.instructions}>
-        Para crear un reporte de incidencia, es necesario iniciar sesión.
+        {instructions}
       </Text>
 
       <Link href={"/(modals)/login"} asChild>

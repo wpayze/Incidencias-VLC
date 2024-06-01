@@ -26,6 +26,26 @@ const issueService = {
       throw error;
     }
   },
+  getIssuesByUserId: async (id: number): Promise<Issue[]> => {
+    try {
+      const response = await fetch(`${API_URL}/issues/user/${id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al obtener las incidencias");
+      }
+
+      const issues: Issue[] = await response.json();
+      return issues;
+    } catch (error) {
+      console.error("Hubo un problema al obtener las incidencias:", error);
+      throw error;
+    }
+  },
   getIssue: async (id: string): Promise<Issue> => {
     try {
       const response = await fetch(`${API_URL}/issues/${id}`, {

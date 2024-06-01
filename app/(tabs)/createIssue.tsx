@@ -158,7 +158,7 @@ const Page: React.FC = () => {
   };
 
   if (!isLoggedIn) {
-    return <LogInBlock title="Crear Reporte de Incidencia" />;
+    return <LogInBlock title="Crear Reporte de Incidencia" instructions="Para crear un reporte de incidencia, es necesario iniciar sesión."/>;
   }
 
   return (
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   input: {
-    marginBottom: 10,
+    marginTop: 10,
     padding: 10,
     borderWidth: 1,
     borderColor: "#cccccc",

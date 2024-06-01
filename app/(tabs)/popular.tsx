@@ -2,7 +2,7 @@ import Colors from "@/constants/colors";
 import { Issue } from "@/constants/issue";
 import issueService from "@/services/issueService";
 import React, { useState, useEffect } from "react";
-import { Link } from "expo-router";
+import { useRouter } from "expo-router";
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import {
   Image,
   RefreshControl,
   ActivityIndicator,
+  TouchableOpacity,
 } from "react-native";
 
 interface IssueItemProps {
@@ -20,19 +21,18 @@ interface IssueItemProps {
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 const IssueItem: React.FC<IssueItemProps> = ({ issue }) => {
+  const router = useRouter();
   return (
-    <Link href={`/listing/${issue.id}`}>
-      <View style={styles.itemContainer}>
-        <Image source={{ uri: `${API_URL}/images/${issue.imageUrl}` }} style={styles.image} />
-        <View style={styles.textContainer}>
-          <Text style={styles.title}>{issue.title}</Text>
-          <Text>{issue.description}</Text>
-          <Text>{issue.address}</Text>
-          <Text>Categoría: {issue.category.name}</Text>
-          <Text>Estado: {issue.status.name}</Text>
-        </View>
+    <TouchableOpacity onPress={() => router.push(`/listing/${issue.id}`)} style={styles.itemContainer}>
+      <Image source={{ uri: `${API_URL}/images/${issue.imageUrl}` }} style={styles.image} />
+      <View style={styles.textContainer}>
+        <Text style={styles.title}>{issue.title}</Text>
+        <Text>{issue.description}</Text>
+        <Text>{issue.address}</Text>
+        <Text>Categoría: {issue.category.name}</Text>
+        <Text>Estado: {issue.status.name}</Text>
       </View>
-    </Link>
+    </TouchableOpacity>
   );
 };
 
