@@ -26,8 +26,8 @@ const Layout = () => {
       <Tabs.Screen
         name="popular"
         options={{
-          tabBarLabel: "Populares",
-          title: "Incidencias mas populares",
+          tabBarLabel: "Recientes",
+          title: "Incidencias mas recientes",
           tabBarIcon: ({ size, color }) => (
             <FontAwesome6 name="fire" size={size} color={color} />
           ),
